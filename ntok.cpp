@@ -11,9 +11,9 @@ char numToChar(int num);
 
 int main() {
     int testcase;
-    cin >> testcase;
+    //cin >> testcase;
     
-    while(testcase--) {
+    //while(testcase--) {
         char strnum[LIMIT] = {};
         int n, k;
         bool isMinus = false;
@@ -28,7 +28,7 @@ int main() {
             long long num = strTo10Num(strnum, n);
             numToKStr(num, k, isMinus);
         }
-    }
+    //}
     
     return 0;
 }
@@ -75,15 +75,19 @@ void numToKStr(long long num, int k, bool isMinus) {
     if(isMinus)
         cout << '-';
     while(index-->0) {
-        cout << result[index];
+        printf("%c", result[index]);
     }
     cout << endl;
 }
 
 
 char numToChar(int num) {
-    if(num<=9)
+    if(num<=9 && num >= 0)
         return num+'0';
+    else if (num < 0){
+        cout << num;
+        return '0';
+    }
     else
         return num-10+'A';
 }
