@@ -168,9 +168,9 @@ struct binarytree_node *bnode_init(datatype data) {
 void bnode_free(struct binarytree_node *node) {
     if (node) {
         //        data_free(node->data);
-//        cout << node->data << "free!" << endl;
+        //        cout << node->data << "free!" << endl;
         free(node);
-//        cout << "free complete!" << endl;
+        //        cout << "free complete!" << endl;
     }
 }
 
@@ -273,7 +273,7 @@ int bst_del_leaf_node (struct bst *tree, struct binarytree_node *node) {
         bnode_free(node);
         return TRUE;
     }
-        return FALSE;
+    return FALSE;
 }
 
 int bst_move_node(struct binarytree_node *dest, struct binarytree_node *target) {
@@ -299,12 +299,18 @@ int bst_move_node(struct binarytree_node *dest, struct binarytree_node *target) 
     }
     
     // connect child
-    if(dest->l_child != target)
+    if(dest->l_child != target) {
         target->l_child = dest->l_child;
+        if(target->l_child)
+            target->l_child->parent = target;
+    }
     else
         target->l_child = NULL;
-    if(dest->r_child != target)
+    if(dest->r_child != target) {
         target->r_child = dest->r_child;
+        if(target->r_child)
+            target->r_child->parent = target;
+    }
     else
         target->r_child = NULL;
     
@@ -333,7 +339,7 @@ int bst_del_node(struct bst *tree, datatype data) {
             
             if(tree->head == del_node)
                 tree->head = up_node;
-
+            
             bnode_free(del_node);
             return 1;
         }
@@ -343,10 +349,10 @@ int bst_del_node(struct bst *tree, datatype data) {
                 parent->r_child = up_node;
             else if(del_node->parent)
                 parent->l_child = up_node;
-                
+            
             if(tree->head == del_node)
                 tree->head = up_node;
-                
+            
             bnode_free(del_node);
             return 1;
         }
@@ -356,7 +362,7 @@ int bst_del_node(struct bst *tree, datatype data) {
 
 struct binarytree_node *bst_search(struct bst *tree, datatype data) {
     if (tree) {
-        struct binarytree_node *curr = tree->head, *temp;
+        struct binarytree_node *curr = tree->head;
         if (!curr) {
             return NULL;
         }

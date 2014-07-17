@@ -4,13 +4,14 @@
 #include <cstring>
 #include <time.h>
 
-#define LIMIT 10
+#define RIGHT_LIMIT(right) (((right)>=LIMIT) ? LIMIT : (right))
+#define LIMIT 200
 
 using namespace std;
 
 
 void quicksort(int *arr, int left, int right);
-void mergesort(int *arr, int length, int unit);
+void mergesort(int *arr, int length);
 void printarr(int *arr, int len);
 
 int main(int argc, char *argv[]) {
@@ -18,11 +19,11 @@ int main(int argc, char *argv[]) {
     int arr2[LIMIT];
     clock_t start;
     for(int i=0;i<LIMIT;i++) {
-        arr[i] = rand()%LIMIT;
+//        arr[i] = LIMIT-i-1;
+        arr[i] = rand()%10;
+        arr2[i] = arr[i];
     }
-    // duplicate array
-    memcpy(arr2, arr, LIMIT);
-
+    
     printf("before\n");
     printarr(arr, LIMIT);
     
@@ -34,14 +35,15 @@ int main(int argc, char *argv[]) {
     
     printf("after Merge sort\n");
     start = clock();
-    mergesort(arr2, LIMIT, 2);
+    mergesort(arr2, LIMIT);
+    printarr(arr2, LIMIT);
     printf("Merge sort time : %lf sec\n", 1.0*(clock()-start)/CLOCKS_PER_SEC);
     return 0;
 }
 
 void swap(int *a, int *b)
 {
-    cout << "swap " << *a << " " << *b << endl;
+//    cout << "swap " << *a << " " << *b << endl;
     int temp = *a;
     *a = *b;
     *b = temp;
@@ -59,41 +61,68 @@ void quicksort(int *arr, int left, int right) {
 //        cout << "left : " << left << " right:" << right << endl;
 		if(left < right)
         	swap(&arr[left], &arr[right]);
-    } while(left < right) ;
+    } while(left < right);
     
 //    cout << "start : " << start << " right:" << right << endl;
     swap(&arr[start], &arr[right]);
+    
 //    cout << "left sort" << endl;
-	if(right != end)
-    	quicksort(arr, start, right);
+	quicksort(arr, start, right);
+
 //    cout << "right sort" << endl;
-	if(right+1 != start)
     quicksort(arr, right+1,end);
 }
 
+// not complete
 void mergesort(int *arr, int length) {
-    if(!arr || length) return;
-    
-    int *arr2 = (int *)malloc(sizeof(int)*length);
+    if(!arr) return;
+    int *original = arr;
+    int *created = (int *)calloc(length, sizeof(int));
+    int *arr2 = created;
     int *temp;
     int unit=1;
-    int left=0, right=1, i, k=0, temp;
+    int left=0, right=1, i, k=0;
+    int changed = 0;
     
-    while(unit > length) {
-        while(left < length) {
-            for (i=0;i<unit*2;i++) {
-                if(arr[left] < arr[right]) {
-                    arr2[k++] = arr[left];
-                    left++;
+    while(unit < length) {
+//        cout << "unit:" << unit << endl;
+        while(left < length && right < length) {
+            int right_temp = right;
+//            cout << "before left:"<< left << " right:" << right << endl;
+            for (i=0;i<unit*2;i++) {}
+            for(i=left;i<left+unit;) {
+                if(arr[i] <= arr[right_temp] || right_temp >= RIGHT_LIMIT(right+unit)) {
+                    arr2[k++] = arr[i++];
                 }
-				else if(arr[left] > arr[right] ) {
-
-				}
+                else if(arr[i] > arr[right_temp]) {
+                    arr2[k++] = arr[right_temp++];
+                }
             }
+            for(i=right_temp;i<RIGHT_LIMIT(right+unit);i++) {
+                arr2[k++] = arr[i];
+            }
+            
+//            printarr(arr2, LIMIT);
+//            cout << "after  left:"<< left << " right:" << right << endl;
+            left = right + unit;
+            right = left + unit;
         }
+        
+        temp = arr;
+        arr = arr2;
+        arr2 = temp;
+        changed = changed ^ 0x1;
+        unit *= 2;
+        left = 0;
+        right = unit;
+        k=0;
     }
     
-    free(arr2);
+    if(changed) {
+        for(int i=0;i<length;i++) 
+            original[i] = created[i];
+    }
+    free(created);
 }
 
 void printarr(int *arr, int len) {
@@ -102,6 +131,7 @@ void printarr(int *arr, int len) {
         printf("%d ",i);
     }
 	putchar('\n');
+    printf("--------------------\n");
     for(int i=0;i<len;i++) {
         printf("%d ", arr[i]);
     }
