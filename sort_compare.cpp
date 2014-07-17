@@ -83,9 +83,12 @@ void mergesort(int *arr, int length) {
         while(left < length) {
             for (i=0;i<unit*2;i++) {
                 if(arr[left] < arr[right]) {
-                    left ++;
-                    arr2[k++] = 
+                    arr2[k++] = arr[left];
+                    left++;
                 }
+				else if(arr[left] > arr[right] ) {
+
+				}
             }
         }
     }
