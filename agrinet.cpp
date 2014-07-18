@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
         int result;
         // check cycle
         if(!(result = bfs(map, visit, house_cnt, temp.p1, temp.p2))) {
-            cout << "from" << temp.p1 << " to" << temp.p2 << endl;
+            //cout << "from" << temp.p1 << " to" << temp.p2 << endl;
             map[temp.p1][temp.p2] = temp.len;
             //            map[temp.p2][temp.p1] = temp.len;
             
@@ -82,20 +82,30 @@ int main(int argc, char *argv[]) {
                 len += map[i][j];
         }
     }
-    print_map(map, house_cnt);
+    //print_map(map, house_cnt);
     cout << len << endl;
     
     return 0;
 }
 
 int bfs(int map[LIMIT][LIMIT], int visit[], int size, int start_point, int search) {
-    if(map && !visit[start_point] && start_point<size) {
-        int i;
+    if(map) {
+        int q[EDGE_LIMIT];
+        int head=0, rear=0;
+        
+        q[rear++] = start_point;
         visit[start_point] = 1;
-        for(i=0;i<size;i++) {
-            if(start_point != i && map[start_point][i]) {
-                //cout << "from :" << start_point << " to: " << i << "looking for " << search << endl;
-                if(i==search || bfs(map, visit, size, i, search)) {
+        
+        while(head >= rear) {
+            int node;
+            node = q[head++];
+            
+            for(int i=0;i<size;i++) {
+                if(map[node][i] && visit[i] == 0) {
+                    visit[i] = 1;
+                    q[rear++] = i;
+                }
+                else if(map[node][i]) {
                     return 1;
                 }
             }
@@ -104,7 +114,7 @@ int bfs(int map[LIMIT][LIMIT], int visit[], int size, int start_point, int searc
         return 0;
     }
     
-    return 0;
+    return 1;
 }
 
 
