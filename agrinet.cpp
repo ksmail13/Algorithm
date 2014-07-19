@@ -66,7 +66,7 @@ int main(int argc, char *argv[]) {
             map[temp.p1][temp.p2] = temp.len;
 
             map[temp.p2][temp.p1] = temp.len;
-//			cout << "i " << temp.p1 <<" j " << temp.p2 << " length " <<temp.len << " \nresult-------------------"  << endl;
+			cout << "i " << temp.p1 <<" j " << temp.p2 << " length " <<temp.len << " \nresult-------------------"  << endl;
 //			print_map(map, house_cnt);
         }
         //cout << "search " << temp.p2 << " result " << result << endl;
