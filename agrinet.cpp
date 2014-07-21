@@ -5,134 +5,105 @@
  */
 #include <iostream>
 #include <cstdio>
-#include <cstring>
 #include <cstdlib>
+#include <cstring>
 
-#define LIMIT 1000
-#define EDGE_LIMIT 100000
+#define FARM_LIMIT 110
+#define LIMIT 100000
+
 using namespace std;
 
-typedef struct edge {
+typedef struct edge{
     int len;
     int p1, p2;
 }Edge;
 
 int edgecmp(const void *data1, const void *data2);
-int bfs(int map[LIMIT][LIMIT], int size, int start_point, int search);
 
-void print_map(int map[LIMIT][LIMIT], int size);
+int search(int m[FARM_LIMIT][FARM_LIMIT], int visit[FARM_LIMIT], int size, int node, int s);
 
-int main(int argc, char *argv[]) {
-    int map[LIMIT][LIMIT] = {};
-	//int netmap[LIMIT][LIMIT] = {};
-    //int visit[EDGE_LIMIT] = {};
-    Edge edge_arr[LIMIT] = {};
-    int edge_idx = 0;
-    int len = 0;
+int main() {
+    int farm_cnt=0;
+    int m[FARM_LIMIT][FARM_LIMIT] = {};
+    int shortmap[FARM_LIMIT][FARM_LIMIT] = {};
+    struct edge e[LIMIT] = {};
+    int edge_cnt=0;
+    int i,j, len=0, conn_cnt=0;
     
-    int house_cnt;
-    
-    cin >> house_cnt;
-    
-    // get graph data from stdin
-    for(int i=0;i<house_cnt;i++)
-        for(int j=0;j<house_cnt;j++)
-            cin >> map[i][j];
-    
-    // make edge set
-    for(int i=0;i<house_cnt;i++) {
-        for(int j=0;j<i;j++) {
-            edge_arr[edge_idx].len = map[i][j];
-            edge_arr[edge_idx].p1 = i;
-            edge_arr[edge_idx++].p2 = j;
-			map[i][j] = 0;
-			map[j][i] = 0;
+    // get map data form stdin
+    scanf("%d", &farm_cnt);
+    for(i=0;i<farm_cnt;i++) {
+        for(j=0;j<farm_cnt;j++) {
+            scanf("%d", &m[i][j]);
         }
     }
     
-    //memset(map, 0, sizeof(map));
-    
-    // sorting for use Kruskal's algorithm
-    qsort((void *)edge_arr, edge_idx, sizeof(Edge), edgecmp);
-    
-    
-    // connect vertex
-    for(int i=0;i<edge_idx;i++) {
-        //        cout << "len " << edge_arr[i].len << " p1 " << edge_arr[i].p1 << " p2 " << edge_arr[i].p2 << endl;
-        Edge &temp = edge_arr[i];
-        int result;
-        // check cycle
-        if(!(result = bfs(map, house_cnt, temp.p1, temp.p2))) {
-            map[temp.p1][temp.p2] = temp.len;
-
-            map[temp.p2][temp.p1] = temp.len;
-			cout << "i " << temp.p1 <<" j " << temp.p2 << " length " <<temp.len << " \nresult-------------------"  << endl;
-//			print_map(map, house_cnt);
-        }
-        //cout << "search " << temp.p2 << " result " << result << endl;
-    }
-    
-    // get cable length
-    for(int i=0;i<house_cnt;i++) {
-        for(int j=0;j<i;j++) {
-            if(map[i][j]) {
-//				cout<<"i" << i << "j" <<j << endl;
-                len += map[i][j];
-			}
+    // set edges
+    for (i=0; i<farm_cnt; i++) {
+        for (j=0; j<i; j++) {
+            if(!m[i][j]) continue;
+            
+            e[edge_cnt].len = m[i][j];
+            e[edge_cnt].p1 = i;
+            e[edge_cnt++].p2 = j;
         }
     }
-    //print_map(map, house_cnt);
-    cout << len << endl;
+    
+    // sort edges
+    qsort(e, edge_cnt, sizeof(struct edge), edgecmp);
+    
+    
+    // generate mst with dfs
+    for(i=0;i<edge_cnt && conn_cnt<farm_cnt;i++) {
+        Edge &temp = e[i];
+        int visit[FARM_LIMIT] = {};
+        if(search(shortmap, visit, farm_cnt, temp.p1, temp.p2) == 0) {
+            shortmap[temp.p1][temp.p2] = temp.len;
+            shortmap[temp.p2][temp.p1] = temp.len;
+            conn_cnt++;
+        }
+    }
+    
+    // sum length
+    for(i=0;i<farm_cnt;i++) {
+        for(j=0;j<i;j++) {
+            len += shortmap[i][j];
+        }
+    }
+    
+    printf("%d\n", len);
     
     return 0;
 }
 
-int bfs(int map[LIMIT][LIMIT], int size, int start_point, int search) {
-    if(map) {
-		int visit[LIMIT]={};
-        int q[EDGE_LIMIT];
-        int head=0, rear=0;
-//        cout << "start point "<< start_point << " search point " << search << endl;
-        q[rear++] = start_point;
-        visit[start_point] = 1;
-        
-        while(head < rear) {
-            int node;
-            node = q[head++];
-            
-            for(int i=0;i<size;i++) {
-//				cout << "node " << node<< " i " << i << " len " << map[node][i] <<endl;
-
-                if(map[node][i] && i == search) {
-                    return 1;
-                }
-				else if(map[node][i] && visit[i] == 0) {
-                    visit[i] = 1;
-                    q[rear++] = i;
-				}
-            }
-        }
-        
-        return 0;
-    }
-    
-    return 1;
-}
-
 
 int edgecmp(const void *data1, const void *data2) {
+    int result =0;
     Edge *e1 = (Edge *)data1;
     Edge *e2 = (Edge *)data2;
     
-    return e1->len - e2->len;
+    result = e1->len - e2->len;
+    if(!result) {
+        result = e2->p1 - e1->p1;
+        if(!result) {
+            result = e1->p2 - e2->p2;
+        }
+    }
+    
+    return result;
 }
 
-
-void print_map(int map[LIMIT][LIMIT], int size) {
-    for(int i=0;i<size;i++) {
-        for(int j=0;j<size;j++) {
-            printf("%6d ", map[i][j]);
+int search(int m[FARM_LIMIT][FARM_LIMIT], int visit[FARM_LIMIT], int size, int node, int s) {
+    if(!m) return 0;
+    int i;
+    for(i=0;i<size;i++) {
+        if(visit[i]==0 && m[node][i]) {
+            visit[i] = 1;
+            if(i == s) return 1;
+            else if(search(m, visit, size, i, s)) return 1;
         }
-        putchar('\n');
     }
+    
+    
+    return 0;
 }
