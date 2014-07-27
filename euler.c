@@ -1,63 +1,52 @@
 #include <stdio.h>
-#define LIMIT 200
+#define LIMIT 110
 
-int map[LIMIT][LIMIT];
-int visit[LIMIT];
+// graph array
+int g[LIMIT][LIMIT];
+// visited check array
+int v[LIMIT][LIMIT];
+// euler path
 int route[LIMIT];
+// index for save euler path
 int r_idx;
 
-/**
- * find way to euler path
- * check visited EDGE NOT VERTEX!!!!!!!!!!!!!!!!!
- * @param : curr current vertex name
- *          ecnt number of edge
- *          vcnt number of vertex
- * @return : is finish(meaningless)
- */
-int dfs(int vcurr, int ecnt, int vcnt) {
-    int i,j;
-    for(i=0;i<ecnt;i++) {
-        if(map[curr][i] && visit[i]==0) {
-            visit[i] = 1;
-            for(j=0;j<vcnt;j++) {
-                if(j != curr && map[j][i]) {
-                    dfs(j, ecnt, vcnt);
-                    break;
-                }
-            }
-            visit[i] = 0;
-        }
-    }
 
-    return 0;
+// find euler path in g(graph)
+// @param : vertex : current vertex name
+//          v_cnt : number of vertex
+//          e_cnt : number of edge
+void get_euler_path(int vertex, int v_cnt, int e_cnt) { 
+    int i,j;
+    // TODO : get euler path using dfs
+    //        check edge not vertex
+
 }
 
-int main() {   
-    int ecnt, vcnt;
-    int i,j, k;
-    int p1, p2;
-    scanf("%d %d", &vcnt, &ecnt);
+int main() {
+    int e_cnt, v_cnt;
+    int i,j;
+    scanf("%d%d", &e_cnt, &v_cnt);
 
-    // get data from standard input
-    for(i=0;i<ecnt;i++) {
-        scanf("%d %d", p1, p2);
-        map[p1][i] = 1;
-        map[p2][i] = 1;
+    for(i=0;i<v_cnt;i++) {
+        int from, to;
+        scanf("%d%d", &from, &to);
+
+        g[from][to] = 1;
+        g[to][from] = 1;
     }
 
-    // loop for vertex
-    for(i=0;i<vcnt;i++) {
-        //loop for edge
-        for(j=0;j<ecnt;j++) {
-            if(map[i][j]) {
-                visit[j] = 1;
-                for(k=0;k<vcnt;k++) {
-                    if(k == i) continue;
-                    dfs(k, ecnt, vcnt);
-                }
-                visit[j]=0;
-            }
+    for(i=1;i<v_cnt;i++) {
+        for(j=1;j<v_cnt;j++) {
+            visit[i][j] = 1;
+            visit[j][i] = 1;
+
+            if(g[i][j])
+                get_euler_path(j, v_cnt, e_cnt);
+
+            visit[i][j] = 0;
+            visit[j][i] = 0;
         }
+
     }
 
     return 0;
