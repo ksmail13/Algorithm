@@ -65,7 +65,6 @@ int short_path(const int start, const int target, int vcurr, int vcnt, const uns
     int i;
     struct data q[LIMIT];
     int front=0, rear=0;
-//    printf("start %d target %d vcurr %d vcnt %d distance %u\n", start, target, vcurr, vcnt, distance);
     // 목표 노드 까지의 최소 거리를 찾았을 때
     if(vcurr == target && distance == dmap[start][target]) {
         for(i=0;i<r_idx;i++) {
@@ -76,14 +75,12 @@ int short_path(const int start, const int target, int vcurr, int vcnt, const uns
     }
 	
     for(i=1;i<=vcnt;i++) {
-		//        printf("vcurr %d i %d map[%d][%d] && !visit[%d][%d] %s\n", vcurr, i, vcurr, i, vcurr,i, (map[vcurr][i] && !visit[vcurr][i])?"true":"false");
         if(map[vcurr][i] && !visit[vcurr][i]) {
             q[rear].target = i;
             q[rear++].len = map[vcurr][i];
             // 기존 시작점과의 거리와 vcurr를 거쳐 가는 경로 중 짧은 것을 저장한다.
             dmap[start][i] = min(dmap[start][i], distance+map[vcurr][i]);
             dmap[i][start] = dmap[start][i];
-			//            printf("dmap[%d][%d] = %d map[%d][%d] = %d \n", start, i, dmap[start][i], vcurr, i, map[vcurr][i]);
             visit[vcurr][i] = 1;
             visit[i][vcurr] = 1;
         }
@@ -95,7 +92,6 @@ int short_path(const int start, const int target, int vcurr, int vcnt, const uns
     while(front<rear) {
         int u = q[front++].target;
         route[r_idx++] = u;
-//        printf("dmap[%d][%d] = %d map[%d][%d] = %d distance = %d\n", start, u, dmap[start][u], vcurr, u, map[vcurr][u], distance);
         if(short_path(start, target, u, vcnt, distance+dmap[vcurr][u])) {
 			// 방문지 초기화
             visit[vcurr][u] = 0;
